@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\Idea;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 
 class IdeaController extends Controller
 {
@@ -12,7 +13,17 @@ class IdeaController extends Controller
      */
     public function index()
     {
-        //
+        // TO get all ideas for the logged in specific user
+        // $ideas = Auth::user()->ideas();
+
+        // TO get all ideas from the database
+        $ideas = Idea::all();
+
+        // To get ideas for a specific user
+        // $ideas = Idea::query()->where({
+        //     'user_id'=> ,
+        // })
+        return view('ideas.index', ['ideas' => $ideas]);
     }
 
     /**
@@ -20,7 +31,7 @@ class IdeaController extends Controller
      */
     public function create()
     {
-        //
+        return view('ideas.create');
     }
 
     /**
@@ -28,7 +39,19 @@ class IdeaController extends Controller
      */
     public function store(Request $request)
     {
-        //
+        $data = $request->validate([
+            'title' => 'required|min:3',
+            'description' => 'required|min:3',
+        ]);
+
+        Idea::create([
+            'title' => $data['title'],
+            'description' => $data['description'],
+            'user_id' => auth()->id(),
+
+        ]);
+
+        return redirect('/ideas');
     }
 
     /**
@@ -36,7 +59,7 @@ class IdeaController extends Controller
      */
     public function show(Idea $idea)
     {
-        //
+        return view('ideas.view', compact('idea'));
     }
 
     /**
@@ -44,7 +67,7 @@ class IdeaController extends Controller
      */
     public function edit(Idea $idea)
     {
-        //
+        return view('ideas.edit', compact('idea'));
     }
 
     /**
@@ -52,7 +75,17 @@ class IdeaController extends Controller
      */
     public function update(Request $request, Idea $idea)
     {
-        //
+        $data = $request->validate([
+            'title' => 'required|min:3',
+            'description' => 'required|min:3',
+        ]);
+        // $request->validate([
+        //     'ideas' => 'required|min:3',
+        // ]);
+
+        $idea->update($data);
+
+        return redirect('/ideas');
     }
 
     /**
@@ -60,6 +93,8 @@ class IdeaController extends Controller
      */
     public function destroy(Idea $idea)
     {
-        //
+        $idea->delete();
+
+        return redirect('/ideas');
     }
 }

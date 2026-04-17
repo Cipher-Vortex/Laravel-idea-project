@@ -35,7 +35,7 @@ class AuthController extends Controller
         // Validating the User request
         $request->validate([
             'name' => ['required', 'string'],
-            'email' => ['required', 'email', Rule::unique('users','email')],
+            'email' => ['required', 'email', Rule::unique('users', 'email')],
             'password' => ['required'],
         ]);
 
@@ -54,31 +54,30 @@ class AuthController extends Controller
         //  Redirect to the main page
         return redirect('/')->with('success', 'Registered in Successfully');
 
-    return back()->withErrors([
-        'email' => 'Invalid credentials',
-    ]);
+        return back()->withErrors([
+            'email' => 'Invalid credentials',
+        ]);
     }
 
     /**
      * Display the specified resource.
      */
-   public function login(Request $request)
-{
-      $credentials =  $request->validate([
-        'email' => ['required', 'email'],
-        'password' => ['required'],
-    ]);
+    public function login(Request $request)
+    {
+        $credentials = $request->validate([
+            'email' => ['required', 'email'],
+            'password' => ['required'],
+        ]);
 
-  
+        if (! Auth::attempt($credentials)) {
+            return back()
+                ->withErrors(['password' => 'Invalid Credentials'])->withInput();
+            // return redirect('/hello')->with('success', 'Logged in Successfully');
+        }
+        $request->session()->regenerate();
 
-    if (! Auth::attempt($credentials)) {
-        return back()
-        ->withErrors(['password'=> 'Invalid Credentials'])->withInput();
-        // return redirect('/hello')->with('success', 'Logged in Successfully');
+        return redirect('/')->with('success', '');
     }
-$request->session()->regenerate();
-    return redirect('/')->with('success','');
-}
 
     public function logout(Request $request)
     {
@@ -86,6 +85,7 @@ $request->session()->regenerate();
 
         return redirect('login');
     }
+
     public function view(Request $request)
     {
         return view('auth.login');
