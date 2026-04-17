@@ -6,6 +6,7 @@ use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
+use Illuminate\Validation\Rule;
 
 class AuthController extends Controller
 {
@@ -34,7 +35,7 @@ class AuthController extends Controller
         // Validating the User request
         $request->validate([
             'name' => ['required', 'string'],
-            'email' => ['required', 'email', 'unique'],
+            'email' => ['required', 'email', Rule::unique('users','email')],
             'password' => ['required'],
         ]);
 
@@ -48,39 +49,45 @@ class AuthController extends Controller
         // Login the User
         Auth::login($user);
 
+        // @dd($user);
+
         //  Redirect to the main page
         return redirect('/')->with('success', 'Registered in Successfully');
 
+    return back()->withErrors([
+        'email' => 'Invalid credentials',
+    ]);
     }
 
     /**
      * Display the specified resource.
      */
-    public function login(Request $request, User $user)
-    {
-        // Validating the User request
-        $request->validate([
-            'name' => ['required', 'string'],
-            'email' => ['required', 'email', 'unique'],
-            'password' => ['required'],
-        ]);
+   public function login(Request $request)
+{
+      $credentials =  $request->validate([
+        'email' => ['required', 'email'],
+        'password' => ['required'],
+    ]);
 
-        if (Auth::attempt([
-            'email' => $request->email,
-            'password' => $request->password,
-        ])) {
-            return redirect('/')->with('success', 'Logged in Successfully');
-        }
+  
 
-        return back()->withErrors([
-            'email ' => 'Invalid credentials',
-        ]);
+    if (! Auth::attempt($credentials)) {
+        return back()
+        ->withErrors(['password'=> 'Invalid Credentials'])->withInput();
+        // return redirect('/hello')->with('success', 'Logged in Successfully');
     }
+$request->session()->regenerate();
+    return redirect('/')->with('success','');
+}
 
     public function logout(Request $request)
     {
         Auth::logout();
 
-        return view('auth/login');
+        return redirect('login');
+    }
+    public function view(Request $request)
+    {
+        return view('auth.login');
     }
 }
