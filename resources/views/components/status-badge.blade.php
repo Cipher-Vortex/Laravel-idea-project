@@ -1,9 +1,9 @@
 @props(['status' => 'pending'])
 
 @php
-    $classes = 'badge badge-soft badge-primary';
+    $classes = 'text-sm';
     if ($status === 'pending') {
-        $classes = 'badge badge-soft badge-primary';
+        $classes = 'badge badge-soft badge-danger';
     }
     if ($status === 'in_progress') {
         $classes = 'badge badge-soft badge-warning';

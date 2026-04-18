@@ -8,8 +8,13 @@ Route::get('/', function () {
     return view('hello');
 });
 Route::get('/hello', function () {
-    return view('hello');
+    // return view('hello');
+    return 'Hello';
 });
+
+
+//  APIdog Endpoint
+Route::get('/api/ideas', [IdeaController::class, 'api']);
 
 Route::middleware('auth')->group(function () {
 

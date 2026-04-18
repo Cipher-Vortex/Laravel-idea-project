@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\Idea;
+use App\IdeaStatus;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 
@@ -11,19 +12,50 @@ class IdeaController extends Controller
     /**
      * Display a listing of the resource.
      */
-    public function index()
+    public function index(Request $request)
     {
         // TO get all ideas for the logged in specific user
-        // $ideas = Auth::user()->ideas();
+        // $ideas = Auth::user()->ideas;
 
         // TO get all ideas from the database
         $ideas = Idea::all();
+        // $ideas = Idea::query()
+        // ->when($request->status ,fn($query , $status)=>
+        // $query->where('status',$status)
+        // )
+        // ->get();
+        // ->where('status','completed');
+
+
+        // count for each status
+        $statusCounts = Auth::user()->ideas()
+        // $statusCounts = Idea::query()
+        ->selectRaw('status,count(*) as count')
+        // ->selectRaw('*')
+        ->groupBy('status')  
+        ->get(); 
+
+        collect(IdeaStatus::cases()) 
+        ->mapWithKeys(fn($status)=>[
+            $status->value => $statusCounts->get($status->value,0),
+        ]);
+
+// return $statusCounts;
 
         // To get ideas for a specific user
-        // $ideas = Idea::query()->where({
-        //     'user_id'=> ,
-        // })
-        return view('ideas.index', ['ideas' => $ideas]);
+        // $ideas = Idea::query()
+        // ->where("user_id",$user->id)
+        // ->get();
+        
+        // return  (compact('ideas','statusCounts'));
+        return view('ideas.index',compact('ideas','statusCounts'));
+    }
+
+    public function api(Idea $idea){
+
+    $ideas = Idea::all();
+    return response($ideas);
+
     }
 
     /**
@@ -47,7 +79,7 @@ class IdeaController extends Controller
         Idea::create([
             'title' => $data['title'],
             'description' => $data['description'],
-            'user_id' => auth()->id(),
+            'user_id' => auth()->id,
 
         ]);
 
