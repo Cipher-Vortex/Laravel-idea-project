@@ -1,9 +1,16 @@
 @props(['idea', 'showActions' => true])
 
-<div class="card bg-gray-900 text-white w-96 shadow-lg">
+<div class="card w-full bg-gray-900 text-white w-96 shadow-lg">
     <div class="card-body">
 
+        <div class="rounded-lg overflow-hidden">
+            @if (!empty($idea->image_path) ?? [])
+                {{-- <img src="{{ asset('storage/' . $idea->image_path) }}" /> --}}
+                <img src="{{ asset('storage/' . $idea->image_path) }}" class="w-full max-h-100 object-cover" />
+            @endif
+        </div>
         <div class="flex justify-between items-start">
+
             <h2 class="card-title text-white">
                 <a href="{{ route('ideas.view', $idea->id) }}" class="hover:underline">
                     {{ $idea->title }}
@@ -17,6 +24,10 @@
 
         <p class="text-gray-300">
             {{ $idea->description }}
+        </p>
+
+        <p class="text-gray-300">
+            {!! $idea->formattedDescription !!}
         </p>
 
         <div class="text-xs text-gray-400 flex justify-between mt-2 ">

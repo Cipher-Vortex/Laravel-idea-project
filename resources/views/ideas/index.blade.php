@@ -10,9 +10,17 @@
 
             <!-- BUTTON (React: setState) -->
             {{-- <button useState => (setOpenModal) </button> @click="$dispatch('xyz-modal', 'create-idea')"> --}}
+            {{-- <a class="btn btn-primary" href="/profile">
+                Edit Profile
+            </a> --}}
             <button class="btn btn-primary" @click="$dispatch('xyz-modal', 'create-idea')">
-                + Create Idea
+                + Create IdeaPolicy
             </button>
+            @can('isAdmin')
+                <a class="btn btn-primary" href="/profile">
+                    Edit Profile
+                </a>
+            @endcan
         </div>
 
         <!-- TEST ALPINE -->
@@ -54,21 +62,36 @@
             class="fixed inset-0 z-50 flex items-center justify-center bg-black/60">
 
             <!-- Modal box -->
-            <div class="bg-white text-black p-6 rounded-lg w-96" @click.outside="modal = null" x-transition.scale.90>
+            <div class="bg-gray-500 text-white p-6 rounded-lg w-96" @click.outside="modal = null" x-transition.scale.90>
                 <h2 class="text-lg font-bold mb-4">
                     Create Idea
                 </h2>
 
-                <p>hdscnl</p>
+                <form x-data="{
+                    status 'pending',
+                
+                }" action="/ideas/create" method="POST" enctype="multipart/form-data"
+                    class="flex flex-col gap-3">
+                    @csrf
 
-                <div class="mt-4 flex justify-end">
-                    <button class="btn btn-primary" @click="modal = null">
-                        Close
-                    </button>
-                </div>
+                    <input name="title" type="text" class="input input-bordered" placeholder="Title" required />
+
+                    <textarea name="description" class="textarea textarea-bordered" placeholder="Description" required></textarea>
+
+                    <input name="image_path" accept="images/*" type="file" class="input input-bordered"
+                        placeholder="Title" required />
+
+                    <div class="mt-4 flex justify-end gap-5">
+                        <button class="btn btn-danger" @click="modal = null">
+                            Close
+                        </button> <button type="submit" class="btn btn-primary">
+                            Submit
+                        </button>
+                </form>
             </div>
-
         </div>
+
+    </div>
     </div>
 
 </x-layout>

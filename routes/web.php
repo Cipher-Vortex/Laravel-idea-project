@@ -2,16 +2,16 @@
 
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\IdeaController;
+use App\Http\Controllers\ProfileController;
 use Illuminate\Support\Facades\Route;
 
 Route::get('/', function () {
-    return view('hello');
+    return view('ideas');
 });
 Route::get('/hello', function () {
     // return view('hello');
     return 'Hello';
 });
-
 
 //  APIdog Endpoint
 Route::get('/api/ideas', [IdeaController::class, 'api']);
@@ -21,6 +21,10 @@ Route::middleware('auth')->group(function () {
     // Route::get('/hello', function () {
     //     return view('hello');
     //     });
+
+    Route::get('/profile', [ProfileController::class, 'view']);
+    Route::patch('/profile/edit', [ProfileController::class, 'update']);
+
     Route::get('/ideas', [IdeaController::class, 'index']);
 
     // create new idea

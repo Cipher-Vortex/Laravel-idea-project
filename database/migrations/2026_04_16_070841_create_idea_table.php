@@ -18,6 +18,7 @@ return new class extends Migration
             $table->string('title');
             $table->text('description')->nullable();
             $table->string('status')->default('pending');
+            $table->string('image')->nullable();
             $table->string('image_path')->nullable();
             $table->json('links')->nullable();
 

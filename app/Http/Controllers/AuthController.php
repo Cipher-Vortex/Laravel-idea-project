@@ -76,7 +76,7 @@ class AuthController extends Controller
         }
         $request->session()->regenerate();
 
-        return redirect('/')->with('success', '');
+        return redirect('/ideas')->with('success', '');
     }
 
     public function logout(Request $request)
