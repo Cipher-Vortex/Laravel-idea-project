@@ -2,11 +2,10 @@
 
 namespace App\Providers;
 
-use Illuminate\Database\Eloquent\Model;
-use Illuminate\Support\ServiceProvider;
-use Illuminate\Support\Facades\Gate;
 use App\Models\User;
-
+use Illuminate\Database\Eloquent\Model;
+use Illuminate\Support\Facades\Gate;
+use Illuminate\Support\ServiceProvider;
 
 class AppServiceProvider extends ServiceProvider
 {
@@ -23,7 +22,7 @@ class AppServiceProvider extends ServiceProvider
      */
     public function boot(): void
     {
-Gate::define('isAdmin', fn (User $user) => $user->id === 3);
+        Gate::define('isAdmin', fn (User $user) => $user->id === 3);
         //    Gate::define('isAdmin', fn (User $user) => $user->id ===3 ? return true : false);
         // Model::unguard();
         // Model::shouldBeStrict();

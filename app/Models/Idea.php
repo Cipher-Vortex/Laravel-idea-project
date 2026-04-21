@@ -18,10 +18,11 @@ class Idea extends Model
 
     //
 
-    protected $fillable = [];
+    protected $fillable = [ 'title','description','image_path','links'];
 
     protected $casts = [
-        'links' => AsArrayObject::class,
+        'links'=>'array',
+        // 'links' => AsArrayObject::class,
         'status' => IdeaStatus::class,
     ];
 

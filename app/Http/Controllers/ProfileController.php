@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Mail;
 
 class ProfileController extends Controller
 {
@@ -59,8 +60,14 @@ class ProfileController extends Controller
         ]);
         // @dd($data);
 
-        // $user = Auth::user();
+        // $originalEmail = $user->email;
+        // // $user = Auth::user();
         Auth::user()->update($data);
+
+        // if($originalEmail !== $request->email){
+        //     Notification::route('mail',$originalEmail)
+        //     ->notify(new Mail($user , ))
+        // }
 
         return redirect('/ideas');
     }

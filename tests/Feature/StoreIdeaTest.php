@@ -12,15 +12,17 @@ test('creating a new idea test_user_can_store_idea_with_image', function () {
     $response = $this->actingAs($user)->post('/ideas/create', [
         'title' => 'Test Idea',
         'description' => 'Test Description',
+        'links.[0]' => 'http://TestLink.com',
         'image_path' => UploadedFile::fake()->image('idea.jpg'),
-    ]);
-
-    $response->assertRedirect('/ideas');
-
-    $this->assertDatabaseHas('ideas', [
-        'title' => 'Test Idea',
-        'description' => 'Test Description',
-        'user_id' => $user->id,
+        ]);
+        
+        $response->assertRedirect('/ideas');
+        
+        $this->assertDatabaseHas('ideas', [
+            'title' => 'Test Idea',
+            'description' => 'Test Description',
+            'links.[0]' => 'http://TestLink.com',
+            'user_id' => $user->id,
     ]);
 
 });

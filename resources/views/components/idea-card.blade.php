@@ -25,6 +25,12 @@
         <p class="text-gray-300">
             {{ $idea->description }}
         </p>
+        {{-- @dd($idea) --}}
+        {{-- @foreach ($idea->links as $link)
+        @endforeach
+        <p class="text-gray-300">
+            {{ $link }}
+        </p> --}}
 
         <p class="text-gray-300">
             {!! $idea->formattedDescription !!}

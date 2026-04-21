@@ -14,7 +14,7 @@
                 Edit Profile
             </a> --}}
             <button class="btn btn-primary" @click="$dispatch('xyz-modal', 'create-idea')">
-                + Create IdeaPolicy
+                + Create Idea
             </button>
             @can('isAdmin')
                 <a class="btn btn-primary" href="/profile">
@@ -39,11 +39,25 @@
 
         <!-- FILTERS -->
         <div class="py-4">
-            <a class="btn" href="/ideas">All</a>
+            <a class="btn {{ request('status') ? 'btn-outline-primary' : 'btn-primary' }}" href="/ideas">
+                All
+            </a>
+            @foreach (App\IdeaStatus::cases() as $status)
+                @php
+                    $colors = [
+                        'pending' => 'btn-warning',
+                        'completed' => 'btn-success',
+                        'in_progress' => 'btn-primary',
+                    ];
+                @endphp
+
+                <a href="/ideas?status={{ $status->value }}"
+                    class="btn {{ request('status') === $status->value ? $status->color() : 'btn-outline-secondary' }}">{{ $status->label() }}</a>
+            @endforeach
         </div>
 
         <!-- IDEAS -->
-        @if ($ideas->count())
+        @if ($ideas)
             <ul class="grid md:grid-cols-2 gap-4">
                 @foreach ($ideas as $idea)
                     <li>
@@ -68,25 +82,67 @@
                 </h2>
 
                 <form x-data="{
-                    status 'pending',
+                    status: 'pending',
+                    newLink: '',
+                    links: []
                 
                 }" action="/ideas/create" method="POST" enctype="multipart/form-data"
                     class="flex flex-col gap-3">
                     @csrf
-
                     <input name="title" type="text" class="input input-bordered" placeholder="Title" required />
 
+                    <!-- Links List -->
+                    <div class="flex flex-col gap-2">
+
+                        <template x-for="(link, index) in links" :key="index">
+                            <div class="flex items-center gap-2 bg-gray-700 p-2 rounded-lg">
+
+                                <!-- hidden input to send to backend -->
+                                <input type="hidden" name="links[]" :value="link">
+
+                                <!-- display link -->
+                                <a :href="link" target="_blank" class="text-sm text-blue-300 truncate flex-1">
+                                    <span x-text="link"></span>
+                                </a>
+
+                                <!-- remove button -->
+                                <button type="button"
+                                    class="text-white bg-red-500 hover:bg-red-600 w-6 h-6 flex rotate-45"
+                                    @click="links.splice(index, 1)">
+                                    +
+                                </button>
+
+                            </div>
+                        </template>
+
+                    </div>
+                    <div class="flex gap-2">
+                        <input x-model="newLink" type="url" class="input input-bordered flex-1"
+                            placeholder="Add a link..." />
+
+                        <button type="button" class="bg-primary px-4 rounded-lg"
+                            @click="if(newLink.trim()){ links.push(newLink.trim()); newLink = '' }">
+                            +
+                        </button>
+                    </div>
+                    {{-- sending links to backend --}}
+                    {{-- @foreach ($links as link)
+                        <input x-text="JSON.stringify(links)" />
+                    @endforeach --}}
                     <textarea name="description" class="textarea textarea-bordered" placeholder="Description" required></textarea>
 
-                    <input name="image_path" accept="images/*" type="file" class="input input-bordered"
-                        placeholder="Title" required />
+                    <input name="image_path" accept="image/*" type="file" class="input input-bordered"
+                        placeholder="Title" />
 
                     <div class="mt-4 flex justify-end gap-5">
-                        <button class="btn btn-danger" @click="modal = null">
+                        <button type="button" class="btn btn-danger" @click="modal = null">
                             Close
-                        </button> <button type="submit" class="btn btn-primary">
+                        </button>
+                        <button type="submit" class="btn btn-primary">
                             Submit
                         </button>
+                    </div>
+
                 </form>
             </div>
         </div>

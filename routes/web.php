@@ -5,9 +5,7 @@ use App\Http\Controllers\IdeaController;
 use App\Http\Controllers\ProfileController;
 use Illuminate\Support\Facades\Route;
 
-Route::get('/', function () {
-    return view('ideas');
-});
+Route::get('/', [IdeaController::class, 'index']);
 Route::get('/hello', function () {
     // return view('hello');
     return 'Hello';

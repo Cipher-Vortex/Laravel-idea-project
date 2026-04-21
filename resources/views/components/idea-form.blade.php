@@ -33,6 +33,20 @@
                 <p class="text-error text-sm mt-1">{{ $message }}</p>
             @enderror
         </div>
+        {{-- Links --}}
+        <div>
+            <label class="label font-semibold">links</label>
+            {{-- @dd($idea) --}}
+            @foreach ($idea->links ?? [] as $index => $link)
+                <input type="text" name="links[]" value="{{ $link }}"
+                    class="w-full border border-dotted p-1.5 m-1 @error('links') textarea-error @enderror"
+                    placeholder="Describe your idea..."></inpu      t>
+            @endforeach
+
+            @error('links')
+                <p class="text-error text-sm mt-1">{{ $message }}</p>
+            @enderror
+        </div>
 
         {{-- Image Upload --}}
         <div>

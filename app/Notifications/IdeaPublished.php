@@ -8,17 +8,17 @@ use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Notifications\Messages\MailMessage;
 use Illuminate\Notifications\Notification;
 
-class IdeaPublished extends Notification
+class IdeaPublished extends Notification implements ShouldQueue
 {
     use Queueable;
-
+public Idea $idea;
     /**
      * Create a new notification instance.
      */
     public function __construct(Idea $idea)
     {
-        //
-    }
+        $this->idea = $idea;
+    } 
 
     /**
      * Get the notification's delivery channels.
@@ -33,11 +33,12 @@ class IdeaPublished extends Notification
     /**
      * Get the mail representation of the notification.
      */
-    public function toMail(object $notifiable, Idea $idea): MailMessage
+    public function toMail($notifiable)
     {
         $url = url('/ideas/'.$this->idea->id);
+
         return (new MailMessage)
-        ->greeting('Hello There')
+            ->greeting('Hello There')
             ->line('The introduction to the notification.')
             ->action('Notification Action', $url)
             ->line('Thank you for using our application!');

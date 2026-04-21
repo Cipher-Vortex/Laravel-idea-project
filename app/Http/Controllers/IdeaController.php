@@ -4,9 +4,9 @@ namespace App\Http\Controllers;
 
 use App\IdeaStatus;
 use App\Models\Idea;
+use App\Notifications\IdeaPublished;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
-use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Gate;
 use Illuminate\Support\Facades\Storage;
 
@@ -18,7 +18,7 @@ class IdeaController extends Controller
     public function index(Request $request)
     {
         // TO get all ideas for the logged in specific user
-        $ideas = Auth::user()->ideas;
+        // $ideas = Auth::user()->ideas;
 
         // TO get all ideas from the database
         // $ideas = Idea::all();
@@ -28,19 +28,33 @@ class IdeaController extends Controller
         // )
         // ->get();
         // ->where('status','completed');
-
+        
+// dd(auth()->user());
         // count for each status
-        $statusCounts = Auth::user()->ideas()
-        // $statusCounts = Idea::query()
-            ->selectRaw('status,count(*) as count')
-        // ->selectRaw('*')
-            ->groupBy('status')
-            ->get();
+        $user = auth()->user();
 
-        collect(IdeaStatus::cases())
-            ->mapWithKeys(fn ($status) => [
-                $status->value => $statusCounts->get($status->value, 0),
-            ]);
+        if(!$user){
+            abort(401);
+        }
+
+        $ideas = $user
+        ->ideas()
+        ->when($request->status, fn($query , $status)=> 
+            $query->where('status',$status))
+        ->get();
+        // ->selectRaw('*')
+        
+        
+        $statusCounts = Idea::query()
+        ->selectRaw('status,count(*) as count')
+        ->groupBy('status')
+        ->pluck('count','status');
+    
+
+        // collect(IdeaStatus::cases())
+        //     ->mapWithKeys(fn ($status) => [
+        //         $status->value => $statusCounts->get($status->value, 0),
+        //     ]);
 
         // return $statusCounts;
 
@@ -73,26 +87,28 @@ class IdeaController extends Controller
     /**
      * Store a newly created resource in storage.
      */
-    public function store(Request $request)
-    {
-        // @dd($request->all());
-        $data = $request->validate([
-            'title' => 'required|min:3',
-            'description' => 'required|min:3',
-            'image_path' => ['nullable', 'image'],
-        ]);
+  public function store(Request $request)
+{
+    // @dd($request->all());
+    $data = $request->validate([
+        'title' => 'required|min:3',
+        'description' => 'required|min:3',
+        'image_path' => ['nullable', 'image'],
+        'links' => ['nullable', 'array'],
+        'links.*' => ['nullable', 'url'],
+    ]);
 
-        Idea::create([
-            'title' => $data['title'],
-            'description' => $data['description'],
-            'image_path' => $data['image_path']->store('ideas', 'public'),
-            // 'user_id' => auth()->id(),
-            'user_id' => Auth::id(),
+    $idea = Auth::user()->ideas()->create([
+        'title' => $data['title'],
+        'description' => $data['description'],
+        'links' => $data['links'] ?? [],
+        'image_path' => $request->file('image_path')?->store('ideas', 'public'),
+    ]);
 
-        ]);
+    Auth::user()->notify(new IdeaPublished($idea));
 
-        return redirect('/ideas');
-    }
+    return redirect('ideas');
+}
 
     /**
      * Display the specified resource.
